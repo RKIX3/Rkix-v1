@@ -6,22 +6,6 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Custom styled scrollbars */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #09090b;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #27272a;
-  border-radius: 9999px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
-}
-
 /* Standard Focus Ring across all interactive inputs/selects/buttons */
 .focus-ring {
   transition: border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1), transform 0.12s ease;
@@ -78,6 +62,23 @@
 
 .animate-slide-up {
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+
+html, body, #root {
+  width: 100%;
+  min-height: 100%;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9fb;
+}
+
+#root {
+  min-height: 100vh;
+  background-color: #f9f9fb;
 }
 
 body {
