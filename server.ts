@@ -1313,12 +1313,34 @@ app.post('/api/github/revert', (req, res) => {
   });
 });
 
+const isValidGitHubOwnerOrRepo = (value: string): boolean => {
+  // GitHub owner/repo names are limited to alphanumerics plus . _ -
+  return /^[A-Za-z0-9._-]{1,100}$/.test(value);
+};
+
+const isValidGitHubRef = (value: string): boolean => {
+  // Allow common ref characters while blocking dangerous patterns.
+  if (!/^[A-Za-z0-9._\/-]{1,200}$/.test(value)) return false;
+  if (value.includes('..') || value.includes('@{')) return false;
+  if (value.startsWith('/') || value.endsWith('/')) return false;
+  return true;
+};
+
 // Compare two branches side by side to review code differences before pulling
 app.get('/api/github/compare', async (req, res) => {
   const { owner, repo, base, head } = req.query as Record<string, string>;
 
   if (!owner || !repo || !base || !head) {
     return res.status(400).json({ error: 'Cần bổ sung thông tin owner, repo, base và head branches.' });
+  }
+
+  if (
+    !isValidGitHubOwnerOrRepo(owner) ||
+    !isValidGitHubOwnerOrRepo(repo) ||
+    !isValidGitHubRef(base) ||
+    !isValidGitHubRef(head)
+  ) {
+    return res.status(400).json({ error: 'Thông tin owner/repo/branch không hợp lệ.' });
   }
 
   // We offer rich, informative comparison mock layout when simulated or if official request hits a snag
@@ -1356,7 +1378,11 @@ app.get('/api/github/compare', async (req, res) => {
   }
 
   try {
-    const url = `https://api.github.com/repos/${owner}/${repo}/compare/${base}...${head}`;
+    const safeOwner = encodeURIComponent(owner);
+    const safeRepo = encodeURIComponent(repo);
+    const safeBase = encodeURIComponent(base);
+    const safeHead = encodeURIComponent(head);
+    const url = `https://api.github.com/repos/${safeOwner}/${safeRepo}/compare/${safeBase}...${safeHead}`;
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${githubAccessToken}`,
